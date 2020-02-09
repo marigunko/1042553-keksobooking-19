@@ -9,7 +9,6 @@ var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var OFFERS_COUNT = 8;
 
-  return "0" + Math.floor(Math.random() * 8) + 1;
 function arrayRandElement(arr) {
     var rand = Math.floor(Math.random() * arr.length);
     return arr[rand];
