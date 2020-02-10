@@ -9,61 +9,92 @@ var LOCATION_Y_MIN = 130;
 var LOCATION_Y_MAX = 630;
 var OFFERS_COUNT = 8;
 
-function arrayRandElement(arr) {
-    var rand = Math.floor(Math.random() * arr.length);
-    return arr[rand];
-}
+var arrayRandElement = function (arr) {
+  var rand = Math.floor(Math.random() * arr.length);
+  return arr[rand];
+};
 
-function getRandomIntInclusive(min, max) {
+var getRandomIntInclusive = function (min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+};
 
-var generateOffers = function(count) {
-  var countOffers = getRandomIntInclusive(FEATURES.length)
-  var feature = arrayRandElement(FEATURES);
-
+var generateRandomArray = function (target) {
+  var count = getRandomIntInclusive(0, target.length);
+  var features = [];
   for (var i = 0; i < count; i++) {
-    while (features.includes(feature)) {
-      feature = arrayRandElement(FEATURES);
-    }
-    return result;
+    features.push(target[i]);
   }
-}
+  return features;
+};
 
-coordX = getRandomNumber(0, 1200);
-coordY = getRandomNumber(LOCATION_Y_MIN, LOCATION_Y_MAX);
-
-var createOffer = function() {
+var createOffer = function (number) {
+  var coordX = getRandomIntInclusive(0, 1200);
+  var coordY = getRandomIntInclusive(LOCATION_Y_MIN, LOCATION_Y_MAX);
   return {
     'author': {
-      'avatar': 'img/avatars/user' + '0' + getRandomNumber(1, 8) + '.png',
-    };
+      'avatar': 'img/avatars/user' + '0' + getRandomIntInclusive(1, 8) + '.png',
+    },
     'offer': {
-      'title': 'Милая, уютная квартирка в центре Токио' + (i + 1),
-      'address': 'coordX' + ',' + 'coordY',
-      'price': getRandomNumber(1, 1000000),
+      'title': 'Милая, уютная квартирка в центре Токио ' + (number + 1),
+      'address': coordX + ', ' + coordY,
+      'price': getRandomIntInclusive(1, 1000000),
       'type': arrayRandElement(TYPE),
-      'rooms': getRandomNumber(1, 100),
-      'guests': getRandomNumber(1, 3),
+      'rooms': getRandomIntInclusive(1, 100),
+      'guests': getRandomIntInclusive(1, 3),
       'checkin': arrayRandElement(TIME),
       'checkout': arrayRandElement(TIME),
-      'features': arrayRandElement(FEATURES),
-      'description': 'Описание' + (i + 1),
+      'features': generateRandomArray(FEATURES),
+      'description': 'Описание ' + (number + 1),
       'photos': arrayRandElement(PHOTOS),
-    };
+    },
     'location': {
       'x': coordX,
       'y': coordY,
-    };
+    },
   };
 };
 
-var getListOfOffers = function () {
+var getListOfOffers = function (number) {
   var offers = [];
   for (var i = 0; i < OFFERS_COUNT; i++) {
     offers[i] = createOffer(i);
   }
   return offers;
 };
+
+var newOffers = getListOfOffers();
+
+var pinTemplate = document.querySelector('#pin')
+  .content.querySelector('.map__pin');
+
+var generatePinElement = function (offer) {
+  var pinElement = pinTemplate.cloneNode(true);
+  var pinX = offer.location.x + 1; //смещение по X;Как это найти?
+  var pinY = offer.location.y + 2; //смещение по Y;
+  pinElement.style = 'left: ' + pinX + 'px; top: ' + pinY + 'px;';
+  pinElement.querySelector('img').setAttribute('src', offer.author.avatar);
+  pinElement.querySelector('img').setAttribute('alt', offer.offer.title);
+  fragment.appendChild(pinElement);
+
+  return pinElement;
+};
+
+
+var fragment = document.createDocumentFragment();
+var mapPins = document.querySelector('.map__pins');
+mapPins.appendChild(fragment);
+
+var putPins = function (offers) {
+
+  for (var i = 0; i < offers.length; i++) {
+    fragment.appendChild(generatePinElement(offers[i]));
+  }
+
+  document.querySelector('.map__pins').appendChild(fragment);
+};
+
+var offers = getListOfOffers();
+
+putPins(offers);
